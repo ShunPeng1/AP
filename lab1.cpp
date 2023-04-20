@@ -1,30 +1,38 @@
 #include "lab1.h"
 
-// Constructor for the Student class
-Student::Student(std::string name = "", int score = 0, int dateOfBirth = 1, std::string schoolName = "", std::string courseName = ""): 
+
+Student::Student(std::string name, int score, std::string dateOfBirth, std::string schoolName, std::string courseName): 
     Name{name}, Score{score}, DateOfBirth{dateOfBirth}, SchoolName{schoolName}, CourseName{courseName}
 {
 
 }
 
-// Implementation of the SetName method
 void Student::SetName(std::string name) {
     this->Name = name;
 }
 
-// Implementation of the SetScore method
 void Student::SetScore(int score) {
     this->Score = score;
 }
 
-// Implementation of the GetName method
 std::string Student::GetName() {
     return this->Name;
 }
 
-// Implementation of the GetScore method
 int Student::GetScore() {
     return this->Score;
+}
+
+std::string Student::GetDateOfBirth() {
+    return this->DateOfBirth;
+}
+
+std::string Student::GetSchoolName() {
+    return this->SchoolName;
+}
+
+std::string Student::GetCourseName() {
+    return this->CourseName;
 }
 
 // Constructor for the StudentManagementSystem class
@@ -57,15 +65,42 @@ void StudentManagementSystem::AddStudent(std::string universityName) {
         
     }
 
-    std::string name;
-    int score;
+    std::string name = "";
+    int score = 0;
+    std::string dateOfBirth = ""; 
+    std::string courseName = ""; 
+    int type = 0;
+    
     std::cout << "Enter student name: ";
     std::cin >> name;
     std::cout << "Enter student score: ";
     std::cin >> score;
+    std::cout << "Enter student date of birth: ";
+    std::cin >> dateOfBirth;
+    std::cout << "Enter student school type (1-2): \n1: University\n2: College\n";
+    std::cin >> type;
+    std::cout << "Enter student course name: ";
+    std::cin >> courseName;
 
-    Student *new_student = new Student(name, score);
-    this->_studentsList[_numStudents] = new_student;
+
+    Student *new_student;
+    switch (type)
+    {
+    case 1:
+        new_student = new UniStudent(name, score, dateOfBirth, universityName, courseName);
+        /* code */
+        break;
+    case 2:
+        new_student = new CollegeStudent(name, score, dateOfBirth, universityName, courseName);
+        /* code */
+        break;
+    default:
+        new_student = new Student(name, score, dateOfBirth, universityName, courseName);
+        break;
+    }
+
+
+    _studentsList[_numStudents] = new_student;
     _numStudents++;
 
     std::cout << "Student added successfully." << std::endl;
@@ -80,7 +115,7 @@ void StudentManagementSystem::DisplayStudents() {
 
     std::cout << "List of students:" << std::endl;
     for (int i = 0; i < _numStudents; i++) {
-        std::cout << i + 1 << ". " << _studentsList[i]->GetName() << " (score: " << _studentsList[i]->GetScore() << ")" << std::endl;
+        std::cout << i + 1 << ". " << _studentsList[i]->GetName() << " (score: " << _studentsList[i]->GetScore() << ")"<< " (date of birth: " << _studentsList[i]->GetDateOfBirth() << ")" << " (school name: " << _studentsList[i]->GetSchoolName() << ")"<< " (course name: " << _studentsList[i]->GetCourseName() << ")" << std::endl;
     }
 }
 
@@ -99,7 +134,7 @@ void StudentManagementSystem::DisplayBestStudents() {
 
     std::cout << "List of Best students:" << std::endl;
     for (int i = 0; i < _numStudents; i++) {
-        if(_studentsList[i]->GetScore() == highest_score) std::cout << i + 1 << ". " << _studentsList[i]->GetName() << " (score: " << _studentsList[i]->GetScore() << ")" << std::endl;
+        if(_studentsList[i]->GetScore() == highest_score) std::cout << i + 1 << ". " << _studentsList[i]->GetName() << " (score: " << _studentsList[i]->GetScore() << ")"<< " (date of birth: " << _studentsList[i]->GetDateOfBirth() << ")" << " (school name: " << _studentsList[i]->GetSchoolName() << ")"<< " (course name: " << _studentsList[i]->GetCourseName() << ")" << std::endl;
     }
 }
 

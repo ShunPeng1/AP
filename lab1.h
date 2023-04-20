@@ -4,7 +4,7 @@
 #include <iostream>
 #include <string>
 
-#define INIT_STUDENT_COUNT 10
+#define INIT_STUDENT_COUNT 100
 
 class Semester{
 private:
@@ -18,17 +18,20 @@ public:
 class Student{
 protected:
     std::string Name;
-    int DateOfBirth;
+    std::string DateOfBirth;
     std::string SchoolName;
     std::string CourseName;
     int Score;
     
 public:
-    Student(std::string name = "", int score = 0, int dateOfBirth = 1, std::string schoolName = "", std::string courseName = "");
+    Student(std::string name = "", int score = 0, std::string dateOfBirth = "", std::string schoolName = "", std::string courseName = "");
     void SetName(std::string name);
     void SetScore(int score);
     std::string GetName();
     int GetScore();
+    std::string GetDateOfBirth();
+    std::string GetSchoolName();
+    std::string GetCourseName();
 };
 
 class UniStudent : public Student{
@@ -40,7 +43,7 @@ private:
     const int NumExam = 1;
 
 public:
-    UniStudent(std::string name, int score, int dateOfBirth = 1, std::string schoolName = "", std::string courseName = ""): 
+    UniStudent(std::string name, int score, std::string dateOfBirth = "", std::string schoolName = "", std::string courseName = ""): 
     Student(name, score, dateOfBirth, schoolName, courseName){
         _semesters = new Semester*[NumSemester];
         for(int i = 0 ; i < NumSemester; i++){
@@ -60,7 +63,7 @@ private:
     const int NumExam = 1;
 
 public:
-    CollegeStudent(std::string name, int score, int dateOfBirth = 1, std::string schoolName = "", std::string courseName = ""): 
+    CollegeStudent(std::string name, int score, std::string dateOfBirth = "", std::string schoolName = "", std::string courseName = ""): 
     Student(name, score, dateOfBirth, schoolName, courseName){
         _semesters = new Semester*[NumSemester];
         for(int i = 0 ; i < NumSemester; i++){
@@ -99,13 +102,6 @@ public:
     School(std::string schoolName, int maxStudents): SchoolName{schoolName} {
         Sms = StudentManagementSystem(maxStudents);
     }
-};
-
-class University: public School {
-private:
-
-public:
-    University(std::string name, int maxStudents = INIT_STUDENT_COUNT) : School(name, maxStudents) {}
 
     void AddStudent() {
         Sms.AddStudent(SchoolName);
@@ -122,6 +118,13 @@ public:
     void DisplayBestStudents() {
         Sms.DisplayBestStudents();
     }
+};
+
+class University: public School {
+private:
+
+public:
+    University(std::string name, int maxStudents = INIT_STUDENT_COUNT) : School(name, maxStudents) {}
 };
 
 #endif // LAB1_H
