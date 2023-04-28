@@ -7,31 +7,113 @@
 #define INIT_STUDENT_COUNT 100
 
 class Semester{
-private:
-    int _assignment;
-    int _test;
-    int _exam;
 public:
-    Semester(int assignment, int test, int exam) : _assignment(assignment), _test(test), _exam(exam){}
+    int *Assignments;
+    int *Tests;
+    int *Exams;
+
+    int AssignmentCount;
+    int TestCount;
+    int ExamCount;
+public:
+    Semester(int assignment, int test, int exam): AssignmentCount{assignment}, TestCount{test}, ExamCount{exam}{
+        Assignments = new int[AssignmentCount];
+        Tests = new int[TestCount];
+        Exams = new int[ExamCount];
+
+        for (size_t i = 0; i < AssignmentCount; i++)
+        {
+            Assignments[i] = 0;
+        }
+
+        for (size_t i = 0; i < TestCount; i++)
+        {
+            Tests[i] = 0;
+        }
+
+        for (size_t i = 0; i < ExamCount; i++)
+        {
+            Exams[i] = 0;
+        }
+    }
+    
+    int GetTotalScore(){
+        int total = 0;
+        for (size_t i = 0; i < AssignmentCount; i++)
+        {
+            total += Assignments[i];
+        }
+
+        for (size_t i = 0; i < TestCount; i++)
+        {
+            total += Tests[i];
+        }
+
+        for (size_t i = 0; i < ExamCount; i++)
+        {
+            total += Exams[i];
+        }
+        
+        return total;
+    }
+
+    void DisplayScores(){
+        std::cout <<"\tAssignment Score: ";
+        for (size_t i = 0; i < AssignmentCount; i++)
+        {
+            std::cout<<Assignments[i] <<", ";
+        }
+
+        std::cout <<"\n\tTest Score: ";
+        for (size_t i = 0; i < TestCount; i++)
+        {
+            std::cout<<Tests[i] <<", ";
+        }
+
+        std::cout <<"\n\tExam Score: ";
+        for (size_t i = 0; i < ExamCount; i++)
+        {
+            std::cout<<Exams[i] <<", ";
+        }
+
+        std::cout <<"\n\tTotal Semester Score: "<< GetTotalScore() << "\n";
+    }
+
+    ~Semester(){
+        delete [] Assignments;
+        delete [] Tests;
+        delete [] Exams;
+    }
 };
 
 class Student{
 protected:
-    std::string Name;
-    std::string DateOfBirth;
-    std::string SchoolName;
-    std::string CourseName;
     int Score;
+    std::string Name = "";
+    std::string DateOfBirth = "";
+    std::string SchoolName = "";
+    std::string CourseName = "";
+    
     
 public:
     Student(std::string name = "", int score = 0, std::string dateOfBirth = "", std::string schoolName = "", std::string courseName = "");
     void SetName(std::string name);
     void SetScore(int score);
     std::string GetName();
-    int GetScore();
     std::string GetDateOfBirth();
     std::string GetSchoolName();
     std::string GetCourseName();
+
+    int GetRandomScore(){
+        return rand() % 11; // score from 0-10
+    }
+
+    virtual int GetScore(){return Score;}
+    virtual void DoAssignment(){}
+    virtual void TakeTest(){}
+    virtual void TakeExam(){}
+    virtual void DisplayScore(){}
+    
 };
 
 class UniStudent : public Student{
@@ -43,13 +125,56 @@ private:
     const int NumExam = 1;
 
 public:
-    UniStudent(std::string name, int score, std::string dateOfBirth = "", std::string schoolName = "", std::string courseName = ""): 
+    UniStudent(std::string name = "", int score = 0, std::string dateOfBirth = "", std::string schoolName = "", std::string courseName = ""): 
     Student(name, score, dateOfBirth, schoolName, courseName){
         _semesters = new Semester*[NumSemester];
         for(int i = 0 ; i < NumSemester; i++){
             Semester * semester = new Semester(NumAssignment, NumTest, NumExam);
             _semesters[i] = semester;
         }
+    }
+    
+    int GetScore() override {
+        int total = 0;
+        for(int i = 0; i < NumSemester; i++) {
+            total += _semesters[i]->GetTotalScore();
+        }
+        return total;
+    }
+
+    void DoAssignment() override {
+        for(int i = 0; i < NumSemester; i++) {
+            for(int j = 0; j < NumAssignment; j++) {
+                _semesters[i]->Assignments[j] = GetRandomScore(); 
+            }
+        }
+        Score = GetScore();
+    }
+
+    void TakeTest() override {
+        for(int i = 0; i < NumSemester; i++) {
+            for(int j = 0; j < NumAssignment; j++) {
+                _semesters[i]->Tests[j] = GetRandomScore(); 
+            }
+        }
+        Score = GetScore();
+    }
+
+    void TakeExam() override {
+        for(int i = 0; i < NumSemester; i++) {
+            for(int j = 0; j < NumAssignment; j++) {
+                _semesters[i]->Exams[j] = GetRandomScore(); 
+            }
+        }
+        Score = GetScore();
+    }
+
+    void DisplayScore() override {
+        for(int i = 0; i < NumSemester; i++) {
+            std::cout<<"Semester "<< i+1 <<":\n";
+            _semesters[i]->DisplayScores();
+        }
+        std::cout<<"Total Score: "<< Score <<":\n";
     }
 
 };
@@ -72,13 +197,56 @@ public:
         }
     }
 
+    int GetScore() override {
+        int total = 0;
+        for(int i = 0; i < NumSemester; i++) {
+            total += _semesters[i]->GetTotalScore();
+        }
+        return total;
+    }
+
+    void DoAssignment() override {
+        for(int i = 0; i < NumSemester; i++) {
+            for(int j = 0; j < NumAssignment; j++) {
+                _semesters[i]->Assignments[j] = GetRandomScore(); 
+            }
+        }
+        Score = GetScore();
+    }
+
+    void TakeTest() override {
+        for(int i = 0; i < NumSemester; i++) {
+            for(int j = 0; j < NumAssignment; j++) {
+                _semesters[i]->Tests[j] = GetRandomScore(); 
+            }
+        }
+        Score = GetScore();
+    }
+
+    void TakeExam() override {
+        for(int i = 0; i < NumSemester; i++) {
+            for(int j = 0; j < NumAssignment; j++) {
+                _semesters[i]->Exams[j] = GetRandomScore(); 
+            }
+        }
+        Score = GetScore();
+    }
+
+    void DisplayScore() override {
+        for(int i = 0; i < NumSemester; i++) {
+            std::cout<<"Semester "<< i+1 <<":\n";
+            _semesters[i]->DisplayScores();
+        }
+        std::cout<<"Total Score: "<< Score <<":\n";
+    }
 };
 
+template <class T>
 class StudentManagementSystem {
 private:
-    Student **_studentsList;
-    int _numStudents;
-    int _maxStudents;
+    T **_studentsList;
+    int _numStudents = 0;
+    int _maxStudents = 0;
 
 private:
     void CreateStudent(std::string universityName);
@@ -91,16 +259,35 @@ public:
     void DisplayStudents();
     void RemoveStudent();
     void DisplayBestStudents();
+
+    void DoAssignment(){
+        for(int i = 0; i < _numStudents; i++){
+            _studentsList[i]->DoAssignment();
+        }
+    }
+
+    void TakeTest(){
+        for(int i = 0; i < _numStudents; i++){
+            _studentsList[i]->TakeTest();
+        }
+    }
+
+    void TakeExam(){
+        for(int i = 0; i < _numStudents; i++){
+            _studentsList[i]->TakeExam();
+        }
+    }
 };
 
+template <class T>
 class School{
 protected:
     std::string SchoolName;
-    StudentManagementSystem Sms;
+    StudentManagementSystem<T> Sms;
 
 public:
     School(std::string schoolName, int maxStudents): SchoolName{schoolName} {
-        Sms = StudentManagementSystem(maxStudents);
+        Sms = StudentManagementSystem<T>(maxStudents);
     }
 
     void AddStudent() {
@@ -118,13 +305,18 @@ public:
     void DisplayBestStudents() {
         Sms.DisplayBestStudents();
     }
-};
 
-class University: public School {
-private:
+    void DoAssignment(){
+        Sms.DoAssignment();
+    }
 
-public:
-    University(std::string name, int maxStudents = INIT_STUDENT_COUNT) : School(name, maxStudents) {}
+    void TakeTest(){
+        Sms.TakeTest();
+    }
+
+    void TakeExam(){
+        Sms.TakeExam();
+    }
 };
 
 #endif // LAB1_H

@@ -19,10 +19,6 @@ std::string Student::GetName() {
     return this->Name;
 }
 
-int Student::GetScore() {
-    return this->Score;
-}
-
 std::string Student::GetDateOfBirth() {
     return this->DateOfBirth;
 }
@@ -36,14 +32,16 @@ std::string Student::GetCourseName() {
 }
 
 // Constructor for the StudentManagementSystem class
-StudentManagementSystem::StudentManagementSystem(int maxStudents) {
-    this->_studentsList = new Student*[maxStudents];
+template <class T>
+StudentManagementSystem<T>::StudentManagementSystem(int maxStudents) {
+    this->_studentsList = new T*[maxStudents];
     this->_numStudents = 0;
     this->_maxStudents = maxStudents;
 }
 
 // Destructor for the StudentManagementSystem class
-StudentManagementSystem::~StudentManagementSystem() {
+template <class T>
+StudentManagementSystem<T>::~StudentManagementSystem() {
     for(int i = 0 ; i<this->_numStudents; i++){
         delete _studentsList[i];
     }
@@ -51,12 +49,13 @@ StudentManagementSystem::~StudentManagementSystem() {
 }
 
 
-void StudentManagementSystem::AddStudent(std::string universityName) {
+template <class T>
+void StudentManagementSystem<T>::AddStudent(std::string universityName) {
     // if the array is full, increase its capacity by doubling it
     if (_numStudents >= _maxStudents) {
         _maxStudents *= 2;
     
-        Student **new_students = new Student*[_maxStudents]; 
+        T **new_students = new T*[_maxStudents]; 
         for (int i = 0; i < _numStudents; i++) {
             new_students[i] = _studentsList[i];
         }
@@ -73,41 +72,20 @@ void StudentManagementSystem::AddStudent(std::string universityName) {
     
     std::cout << "Enter student name: ";
     std::cin >> name;
-    std::cout << "Enter student score: ";
-    std::cin >> score;
     std::cout << "Enter student date of birth: ";
     std::cin >> dateOfBirth;
-    std::cout << "Enter student school type (1-2): \n1: University\n2: College\n";
-    std::cin >> type;
     std::cout << "Enter student course name: ";
     std::cin >> courseName;
 
-
-    Student *new_student;
-    switch (type)
-    {
-    case 1:
-        new_student = new UniStudent(name, score, dateOfBirth, universityName, courseName);
-        /* code */
-        break;
-    case 2:
-        new_student = new CollegeStudent(name, score, dateOfBirth, universityName, courseName);
-        /* code */
-        break;
-    default:
-        new_student = new Student(name, score, dateOfBirth, universityName, courseName);
-        break;
-    }
-
-
-    _studentsList[_numStudents] = new_student;
+    _studentsList[_numStudents] = new T(name, score, dateOfBirth, universityName, courseName);
     _numStudents++;
 
     std::cout << "Student added successfully." << std::endl;
-
 }
 
-void StudentManagementSystem::DisplayStudents() {
+
+template <class T>
+void StudentManagementSystem<T>::DisplayStudents() {
     if (_numStudents == 0) {
         std::cout << "No students found!" << std::endl;
         return;
@@ -115,11 +93,14 @@ void StudentManagementSystem::DisplayStudents() {
 
     std::cout << "List of students:" << std::endl;
     for (int i = 0; i < _numStudents; i++) {
-        std::cout << i + 1 << ". " << _studentsList[i]->GetName() << " (score: " << _studentsList[i]->GetScore() << ")"<< " (date of birth: " << _studentsList[i]->GetDateOfBirth() << ")" << " (school name: " << _studentsList[i]->GetSchoolName() << ")"<< " (course name: " << _studentsList[i]->GetCourseName() << ")" << std::endl;
+        std::cout << i + 1 << ": " << _studentsList[i]->GetName() << " (date of birth: " << _studentsList[i]->GetDateOfBirth() << ")" << " (school name: " << _studentsList[i]->GetSchoolName() << ")"<< " (course name: " << _studentsList[i]->GetCourseName() << ")" << std::endl;
+        _studentsList[i]->DisplayScore();
     }
 }
 
-void StudentManagementSystem::DisplayBestStudents() {
+
+template <class T>
+void StudentManagementSystem<T>::DisplayBestStudents() {
     if (_numStudents == 0) {
         std::cout << "No students found!" << std::endl;
         return;
@@ -134,11 +115,16 @@ void StudentManagementSystem::DisplayBestStudents() {
 
     std::cout << "List of Best students:" << std::endl;
     for (int i = 0; i < _numStudents; i++) {
-        if(_studentsList[i]->GetScore() == highest_score) std::cout << i + 1 << ". " << _studentsList[i]->GetName() << " (score: " << _studentsList[i]->GetScore() << ")"<< " (date of birth: " << _studentsList[i]->GetDateOfBirth() << ")" << " (school name: " << _studentsList[i]->GetSchoolName() << ")"<< " (course name: " << _studentsList[i]->GetCourseName() << ")" << std::endl;
+        if(_studentsList[i]->GetScore() == highest_score) {
+            std::cout << i + 1 << ": " << _studentsList[i]->GetName() << " (date of birth: " << _studentsList[i]->GetDateOfBirth() << ")" << " (school name: " << _studentsList[i]->GetSchoolName() << ")"<< " (course name: " << _studentsList[i]->GetCourseName() << ")" << std::endl;
+            _studentsList[i]->DisplayScore();
+        }
     }
 }
 
-void StudentManagementSystem::RemoveStudent() {
+
+template <class T>
+void StudentManagementSystem<T>::RemoveStudent() {
     if (_numStudents == 0) {
         std::cout << "No students found!" << std::endl;
         return;
@@ -172,37 +158,117 @@ void StudentManagementSystem::RemoveStudent() {
         std::cout << "Student not found!" << std::endl;
     }
 }
-int main() {
-    University university("Bach Khoa University", INIT_STUDENT_COUNT);
 
-    int choice;
+int main() {
+    School<UniStudent> university("Bach Khoa University", INIT_STUDENT_COUNT);
+    School<CollegeStudent> college("Cao Thang Technical College", INIT_STUDENT_COUNT);
+    
     while (true) {
+        int choice = 0, type = 0;
+        while(type < 1 || type > 3){
+            std::cout << "Enter student school type (1-2): \n1: Bach Khoa University\n2: Cao Thang Technical College\n3: Quit\n";
+            std::cin >> type;
+
+            switch (type)
+            {
+            case 1:
+                std::cout << "Entering Bach Khoa University, Choose an option:" << std::endl;
+                break;
+            case 2:
+                std::cout << "Entering Cao Thang Technical College, Choose an option:" << std::endl;
+                break;
+            case 3:
+                std::cout << "Application Quit!\n";
+                return 0;
+                break;
+            default:
+                std::cout << "Invalid choice!" << std::endl;
+                break;
+            }
+
+        }
+
+        while(choice < 1 || choice > 8){
         std::cout << "Choose an option:" << std::endl;
         std::cout << "1. Add a student" << std::endl;
         std::cout << "2. Display all students" << std::endl;
         std::cout << "3. Display best students" << std::endl;
         std::cout << "4. Remove a student" << std::endl;
-        std::cout << "5. Quit" << std::endl;
+        std::cout << "5. Give Assigment to all students" << std::endl;
+        std::cout << "6. Give Test to all students" << std::endl;
+        std::cout << "7. Give Exam to all students" << std::endl;
+        std::cout << "8. Return choosing school" << std::endl;
         std::cin >> choice;
 
-        switch (choice) {
+        switch (type)
+        {
             case 1:
-                university.AddStudent();
+
+                    switch (choice) {
+                case 1:
+                    university.AddStudent();
+                    break;
+                case 2:
+                    university.DisplayStudents();
+                    break;
+                case 3:
+                    university.DisplayBestStudents();
+                    break;
+                case 4:
+                    university.RemoveStudent();
+                    break;
+                case 5:
+                    university.DoAssignment();
+                    break;
+                case 6:
+                    university.TakeTest();
+                    break;
+                case 7:
+                    university.TakeExam();
+                    break;
+                case 8:
+                    break;
+                default:
+                    std::cout << "Invalid choice!" << std::endl;
+                    break;
+                }
+            
                 break;
+
             case 2:
-                university.DisplayStudents();
+
+                    switch (choice) {
+                case 1:
+                    college.AddStudent();
+                    break;
+                case 2:
+                    college.DisplayStudents();
+                    break;
+                case 3:
+                    college.DisplayBestStudents();
+                    break;
+                case 4:
+                    college.RemoveStudent();
+                    break;
+                case 5:
+                    college.DoAssignment();
+                    break;
+                case 6:
+                    college.TakeTest();
+                    break;
+                case 7:
+                    college.TakeExam();
+                    break;
+                case 8:
+                    break;
+                default:
+                    std::cout << "Invalid choice!" << std::endl;
+                    break;
+                }
+            
                 break;
-            case 3:
-                university.DisplayBestStudents();
-                break;
-            case 4:
-                university.RemoveStudent();
-                break;
-            case 5:
-                return 0;
-            default:
-                std::cout << "Invalid choice!" << std::endl;
-                break;
+            }
         }
+        
     }
 }
