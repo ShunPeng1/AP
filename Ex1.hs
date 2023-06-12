@@ -1,8 +1,7 @@
-
 doubleAll :: [Int] -> [Int]
 doubleAll [] = []
-doubleAll (x:ns) = (x * 2) : doubleAll ns
+doubleAll (x:xs) = (x * 2) : (doubleAll xs) 
 
 positives :: [Int] -> [Int]
-positives ns = filter(>=0)  ns
+positives xs = [x | x <- xs, x > 0]
 

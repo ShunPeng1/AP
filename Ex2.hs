@@ -1,8 +1,7 @@
 
-removeIndex :: Int -> ([a] -> [a])
-removeIndex index (x:xs) 
-    | index == 0 = xs
-    | otherwise = x : removeIndex (index - 1) xs 
+removeIndex :: Int -> [a] -> [a]
 removeIndex _ [] = []
-
+removeIndex i (x:xs)  
+    | i == 0 = (removeIndex (i-1) xs)
+    | otherwise = x : (removeIndex (i-1) xs)
 
